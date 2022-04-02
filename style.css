@@ -7,9 +7,11 @@
 body {
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background-color: rgb(100, 100, 100);
 }
 
 #container {
@@ -17,15 +19,22 @@ body {
   align-items: flex-end;
   height: 800px;
   width: 100%;
-  max-width: 1000px;
-  border: 2px solid #000;
+
+  /* max-width: 1000px; */
 }
 
-#container div {
+.bar {
   bottom: 8px;
   position: absolute;
   width: 50%;
   height: 200px;
-  background-color: orange;
+  background-color: rgb(255, 220, 80);
   border-radius: 16px 16px 0 0;
+  transition: 0.6s cubic-bezier(0.6, 0, 0, 1.2);
+  text-align: center;
+  padding: 8px;
+}
+
+.color {
+  background-color: red;
 }
