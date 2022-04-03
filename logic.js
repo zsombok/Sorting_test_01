@@ -1,10 +1,24 @@
 const host = document.querySelector('#container')
 const els = host.children
-const ARRAY_SIZE = 10
-const PADDING = 8
+const sizeSlider = document.querySelector('#array-size')
+
+let arraySize = sizeSlider.value
+const PADDING = 4
 const EL_MIN_HEIGHT = 20
+const EL_MIN_WIDTH = 4
+const SHOW_LABEL = true
+const SHOW_LABEL_WIDTH = 40
 
 window.addEventListener('load', (e) => {
+  resetArray()
+})
+
+window.addEventListener('resize', () =>{
+  resetArray()
+})
+
+sizeSlider.addEventListener('input', (e) => {
+  arraySize = e.target.value
   resetArray()
 })
 
@@ -14,16 +28,15 @@ const resetArray = () => {
 }
 
 const generateArray = () => {
-  const elWidth = (host.clientWidth - PADDING) / ARRAY_SIZE
+  const elWidth = (host.clientWidth - PADDING) / arraySize
   const elMaxHeight = host.clientHeight - PADDING * 2
-  for (let i = 0; i < ARRAY_SIZE; i++) {
+  for (let i = 0; i < arraySize; i++) {
     const el = document.createElement('div')
-    el.style.width = (elWidth - 8) + 'px'
-    el.style.height = EL_MIN_HEIGHT + Math.floor(Math.random() * (elMaxHeight - EL_MIN_HEIGHT)) + 'px'
-    el.style.left = ((elWidth) * i + 8) + 'px'
+    const width = Math.max(EL_MIN_WIDTH, (elWidth - PADDING))
+    const height = EL_MIN_HEIGHT + Math.floor(Math.random() * (elMaxHeight - EL_MIN_HEIGHT))
+    const left = ((elWidth) * i + 8)
+    setBarStyle(el, width, height, left)
     // el.style.backgroundColor = 'rgba(255,220,40,' + Number.parseInt(el.style.height) / (elMaxHeight - EL_MIN_HEIGHT) + ')'
-    el.classList.add('bar')
-    el.textContent = Number.parseInt(el.style.height)
     host.append(el)
   }
 }
@@ -37,33 +50,46 @@ const sort = () => {
     setTimeout(() => {
       if (Number.parseInt(elOne.style.height) > Number.parseInt(elTwo.style.height)) {
         const tempHeight = Number.parseInt(elOne.style.height)
-        elOne.style.height = Number.parseInt(elTwo.style.height) + 'px'
-        elOne.style.backgroundColor = 'rgba(255,220,40,' + Number.parseInt(elTwo.style.height) / (elMaxHeight - EL_MIN_HEIGHT) + ')'
-        elOne.textContent = Number.parseInt(elTwo.style.height)
-        elTwo.style.height = tempHeight + 'px'
-        elTwo.style.backgroundColor = 'rgba(255,220,40,' + tempHeight / (elMaxHeight - EL_MIN_HEIGHT) + ')'
-        elTwo.textContent = tempHeight
+        setBarHeight(elOne, Number.parseInt(elTwo.style.height))
+        setBarHeight(elTwo, tempHeight)
       }
-    }, 20 * i);
+    }, 40 * i);
   }
 }
 
-// procedure bubbleSort(A : list of sortable items)
-//     n := length(A)
-//     repeat
-//         swapped := false
-//         for i := 1 to n - 1 inclusive do
-//             if A[i - 1] > A[i] then
-//                 swap(A[i - 1], A[i])
-//                 swapped := true
-//             end if
-//         end for
-//         n := n - 1
-//     until not swapped
-// end procedure
-
 const quickSort = () => {
-  quickSortRecursive(els, 0, els.length - 1)
+  // quickSortNodesRecursive(els, 0, els.length - 1)
+  const heights = Array.from(els).map(el => Number.parseInt(el.style.height))
+  console.log(heights)
+  quickSortRecursive(heights, 0, heights.length - 1)
+  console.log(heights)
+  animateHeights(els, heights)
+}
+
+const animateHeights = (nodes, heights) => {
+  for (let i = 0; i < nodes.length; i++) {
+    const bar = nodes[i];
+    setTimeout(() => {
+      setBarHeight(bar, heights[i])
+    }, 40 * i);
+  }
+}
+
+const setBarHeight = (bar, height) => {
+  bar.style.height = height + 'px'
+  if (SHOW_LABEL && Number.parseInt(bar.style.width) > SHOW_LABEL_WIDTH) {
+    bar.textContent = height
+  }
+}
+
+const setBarStyle = (bar, width, height, left) => {
+  bar.style.width = width + 'px'
+  bar.style.height = height + 'px'
+  bar.style.left = left + 'px'
+  bar.classList.add('bar')
+  if (SHOW_LABEL && Number.parseInt(bar.style.width)   > SHOW_LABEL_WIDTH) {
+    bar.textContent = height
+  }
 }
 
 const quickSortRecursive = (arr, lo, hi) => {
@@ -76,10 +102,40 @@ const quickSortRecursive = (arr, lo, hi) => {
 
 const partition = (arr, lo, hi) => {
 
+  let pivot = arr[hi]
+  let index = lo - 1
+
+  for (let i = lo; i < hi; i++) {
+    if (arr[i] <= pivot) {
+      index = index + 1
+      let temp = arr[i]
+      arr[i] = arr[index]
+      arr[index] = temp
+    }
+
+  }
+  index = index + 1
+  let temp = arr[hi]
+  arr[hi] = arr[index]
+  arr[index] = temp
+
+  return index
+}
+
+const quickSortNodesRecursive = (arr, lo, hi) => {
+  if (lo >= hi || lo < 0) return
+
+  let index = partitionNodes(arr, lo, hi)
+  quickSortNodesRecursive(arr, lo, index - 1)
+  quickSortNodesRecursive(arr, index + 1, hi)
+}
+
+const partitionNodes = (arr, lo, hi) => {
+
   let pivot = Number.parseInt(arr[hi].style.height)
   let index = lo - 1
 
-  for (let i = lo; i < hi - 1; i++) {
+  for (let i = lo; i < hi; i++) {
     if (Number.parseInt(arr[i].style.height) <= pivot) {
       index = index + 1
       let temp = Number.parseInt(arr[i].style.height)
@@ -95,37 +151,3 @@ const partition = (arr, lo, hi) => {
 
   return index
 }
-
-
-// // Sorts a (portion of an) array, divides it into partitions, then sorts those
-// algorithm quicksort(A, lo, hi) is 
-//   // Ensure indices are in correct order
-//   if lo >= hi || lo < 0 then 
-//     return
-    
-//   // Partition array and get the pivot index
-//   p := partition(A, lo, hi) 
-      
-//   // Sort the two partitions
-//   quicksort(A, lo, p - 1) // Left side of pivot
-//   quicksort(A, p + 1, hi) // Right side of pivot
-
-// // Divides array into two partitions
-// algorithm partition(A, lo, hi) is 
-//   pivot := A[hi] // Choose the last element as the pivot
-
-//   // Temporary pivot index
-//   i := lo - 1
-
-//   for j := lo to hi - 1 do 
-//     // If the current element is less than or equal to the pivot
-//     if A[j] <= pivot then 
-//       // Move the temporary pivot index forward
-//       i := i + 1
-
-//       // Swap the current element with the element at the temporary pivot index
-//       swap A[i] with A[j]
-//   // Move the pivot element to the correct pivot position (between the smaller and larger elements)
-//   i := i + 1
-//   swap A[i] with A[hi]
-//   return i // the pivot index

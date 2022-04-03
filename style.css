@@ -4,6 +4,40 @@
   box-sizing: border-box;
 }
 
+input[type="range"] {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+input[type="range"]:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
 body {
   width: 100%;
   display: flex;
@@ -11,7 +45,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: rgb(100, 100, 100);
+  background-color: rgb(64, 64, 64);
 }
 
 #container {
@@ -29,10 +63,10 @@ body {
   width: 50%;
   height: 200px;
   background-color: rgb(255, 220, 80);
-  border-radius: 16px 16px 0 0;
+  border-radius: 8px 8px 0 0;
   transition: 0.6s cubic-bezier(0.6, 0, 0, 1.2);
   text-align: center;
-  padding: 8px;
+  padding-top: 4px;
 }
 
 .color {
